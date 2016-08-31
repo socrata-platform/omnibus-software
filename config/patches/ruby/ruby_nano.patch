@@ -17,7 +17,14 @@
  static void ole_freeexceptinfo(EXCEPINFO *pExInfo);
  static VALUE ole_excepinfo2msg(EXCEPINFO *pExInfo);
  static void ole_free(void *ptr);
-@@ -817,18 +820,47 @@ ole_initialize(void)
+@@ -812,23 +815,51 @@ ole_initialize(void)
+     HRESULT hr;
+ 
+     if(!g_uninitialize_hooked) {
+-	rb_add_event_hook(ole_uninitialize_hook, RUBY_EVENT_THREAD_END, Qnil);
+-	g_uninitialize_hooked = TRUE;
++    rb_add_event_hook(ole_uninitialize_hook, RUBY_EVENT_THREAD_END, Qnil);
++    g_uninitialize_hooked = TRUE;
      }
  
      if(g_ole_initialized == FALSE) {
@@ -51,14 +58,13 @@
 +{
 +    HKEY hsubkey;
 +    LONG err;
-+    VALUE subkey;
++    const char * subkey = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Server\\ServerLevels";
++    const char * regval = "NanoServer";
 +
 +    if(g_nano_checked == FALSE) {
-+        subkey = rb_str_new2("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Server\\ServerLevels");
-+        err = RegOpenKeyEx(HKEY_LOCAL_MACHINE, StringValuePtr(subkey), 0, KEY_READ, &hsubkey);
++        err = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_READ, &hsubkey);
 +        if (err == ERROR_SUCCESS) {
-+            subkey = rb_str_new2("NanoServer");
-+            err = RegQueryValueEx(hsubkey, StringValuePtr(subkey), NULL, NULL, NULL, NULL);
++            err = RegQueryValueEx(hsubkey, regval, NULL, NULL, NULL, NULL);
 +            if (err == ERROR_SUCCESS) {
 +                g_running_nano = TRUE;
 +            }
