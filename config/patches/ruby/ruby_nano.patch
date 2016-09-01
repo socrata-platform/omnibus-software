@@ -1,35 +1,19 @@
 --- a/ext/win32ole/win32ole.c
 +++ b/ext/win32ole/win32ole.c
-@@ -50,6 +50,8 @@ static volatile DWORD g_ole_initialized_key = TLS_OUT_OF_INDEXES;
+@@ -50,6 +50,7 @@ static volatile DWORD g_ole_initialized_key = TLS_OUT_OF_INDEXES;
  static BOOL g_uninitialize_hooked = FALSE;
  static BOOL g_cp_installed = FALSE;
  static BOOL g_lcid_installed = FALSE;
-+static BOOL g_nano_checked = FALSE;
 +static BOOL g_running_nano = FALSE;
  static HINSTANCE ghhctrl = NULL;
  static HINSTANCE gole32 = NULL;
  static FNCOCREATEINSTANCEEX *gCoCreateInstanceEx = NULL;
-@@ -95,6 +97,7 @@ NORETURN(static void failed_load_conv51932(void));
- static void load_conv_function51932(void);
- #endif
- static UINT ole_init_cp(void);
-+static BOOL running_nano_server(void);
- static void ole_freeexceptinfo(EXCEPINFO *pExInfo);
- static VALUE ole_excepinfo2msg(EXCEPINFO *pExInfo);
- static void ole_free(void *ptr);
-@@ -812,23 +815,51 @@ ole_initialize(void)
-     HRESULT hr;
- 
-     if(!g_uninitialize_hooked) {
--	rb_add_event_hook(ole_uninitialize_hook, RUBY_EVENT_THREAD_END, Qnil);
--	g_uninitialize_hooked = TRUE;
-+    rb_add_event_hook(ole_uninitialize_hook, RUBY_EVENT_THREAD_END, Qnil);
-+    g_uninitialize_hooked = TRUE;
+@@ -817,16 +818,22 @@ ole_initialize(void)
      }
  
      if(g_ole_initialized == FALSE) {
 -        hr = OleInitialize(NULL);
-+        if(running_nano_server() == TRUE) {
++        if(g_running_nano == TRUE) {
 +            hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
 +        } else {
 +            hr = OleInitialize(NULL);
@@ -43,36 +27,42 @@
 -        if(FAILED(hr)) {
 -            previous_filter = NULL;
 -            ole_raise(hr, rb_eRuntimeError, "fail: install OLE MessageFilter");
-+        if(running_nano_server() == FALSE) {
++        if(g_running_nano == FALSE) {
 +            hr = CoRegisterMessageFilter(&imessage_filter, &previous_filter);
 +            if(FAILED(hr)) {
 +                previous_filter = NULL;
 +                ole_raise(hr, rb_eRuntimeError, "fail: install OLE MessageFilter");
 +            }
-+        }
-+    }
-+}
-+
-+static BOOL
-+running_nano_server(void)
+         }
+     }
+ }
+@@ -3890,10 +3897,29 @@ com_hash_size(const void *ptr)
+ }
+ 
+ void
++check_nano_server(void)
 +{
 +    HKEY hsubkey;
 +    LONG err;
 +    const char * subkey = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Server\\ServerLevels";
 +    const char * regval = "NanoServer";
 +
-+    if(g_nano_checked == FALSE) {
-+        err = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_READ, &hsubkey);
++    err = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_READ, &hsubkey);
++    if (err == ERROR_SUCCESS) {
++        err = RegQueryValueEx(hsubkey, regval, NULL, NULL, NULL, NULL);
 +        if (err == ERROR_SUCCESS) {
-+            err = RegQueryValueEx(hsubkey, regval, NULL, NULL, NULL, NULL);
-+            if (err == ERROR_SUCCESS) {
-+                g_running_nano = TRUE;
-+            }
-+            RegCloseKey(hsubkey);
-         }
-+        g_nano_checked = TRUE;
-     }
-+    return g_running_nano;
- }
++            g_running_nano = TRUE;
++        }
++        RegCloseKey(hsubkey);
++    }
++}
++
++void
+ Init_win32ole(void)
+ {
+     cWIN32OLE_lcid = LOCALE_SYSTEM_DEFAULT;
+     g_ole_initialized_init();
++    check_nano_server();
  
- static void
+     com_vtbl.QueryInterface = QueryInterface;
+     com_vtbl.AddRef = AddRef;
