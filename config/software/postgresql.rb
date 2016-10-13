@@ -28,6 +28,10 @@ dependency "ncurses"
 dependency "libossp-uuid"
 dependency "config_guess"
 
+version "9.2.18" do
+  source sha512: "c311f621ac38e2dfaf5fd57a4500430333dcbb2d7f1719bc7d99fef54e06a22f93aea595391c3607d44c89c372d0e89daf18f8f295b33e3b21e5285fbbb87d5b"
+end
+
 version "9.2.14" do
   source md5: "ce2e50565983a14995f5dbcd3c35b627"
 end
@@ -42,6 +46,14 @@ end
 
 version "9.2.8" do
   source md5: "c5c65a9b45ee53ead0b659be21ca1b97"
+end
+
+version "9.6.0" do
+  source sha512: "46ec903eed13bf5fb5510d56e4814405ba4510c9e5f43c533189b6ed07c7955dba326107ae0dbeebb5abdd00b7007971ca5d7213274bd653d8d4295f93e6cbf8"
+end
+
+version "9.5.4" do
+  source sha512: "e5220bc967443d54b9dcff7ba5aefccedbe1c219f953eb0d67254c709d52b0e647d1dc473446640804165b596fc5b75fa4ff8d63696123b87d8096c3a7795c34"
 end
 
 version "9.5.1" do
@@ -99,6 +111,8 @@ end
 version "9.1.9" do
   source md5: "6b5ea53dde48fcd79acfc8c196b83535"
 end
+
+
 
 source url: "https://ftp.postgresql.org/pub/source/v#{version}/postgresql-#{version}.tar.bz2"
 
