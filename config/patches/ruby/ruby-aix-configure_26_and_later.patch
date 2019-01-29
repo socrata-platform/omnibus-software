@@ -1,0 +1,18 @@
+--- ruby-2.6.0/configure.orig	2019-01-28 19:31:52.000000000 -0800
++++ ruby-2.6.0/configure	2019-01-28 19:30:18.000000000 -0800
+@@ -26789,6 +26789,7 @@
+                             LDSHARED="$LDSHARED ${linker_flag}-G"
+
+ fi
++                        DLDFLAGS='-eInit_$(TARGET)'
+                         EXTDLDFLAGS='-e$(TARGET_ENTRY)'
+                         XLDFLAGS="${linker_flag}"'-bE:$(ARCHFILE)'" ${linker_flag}-brtl"
+                         XLDFLAGS="$XLDFLAGS ${linker_flag}-blibpath:${prefix}/lib:${LIBPATH:-/usr/lib:/lib}"
+@@ -28064,7 +28065,7 @@
+ esac
+         done
+         LIBRUBYARG_SHARED='-L${libdir} -l${RUBY_SO_NAME}'
+-        LIBS="$LIBS -lm -lc"
++        LIBS="$LIBS -lm -lc -lz"
+          ;; #(
+   darwin*) :
