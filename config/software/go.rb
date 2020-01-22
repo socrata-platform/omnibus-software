@@ -55,6 +55,6 @@ build do
   # We do not use 'sync' since we've found multiple errors with other software definitions
   copy "#{project_dir}/go", "#{install_dir}/embedded/go"
   %w{go gofmt}.each do |bin|
-    link "#{install_dir}/embedded/go/bin/#{bin}", "#{install_dir}/embedded/bin/#{bin}"
+    link "#{install_dir}/embedded/go/bin/#{bin}", "#{install_dir}/embedded/bin/#{bin}" , force: true
   end
 end
