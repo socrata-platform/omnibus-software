@@ -45,7 +45,7 @@ build do
   env["CFLAGS"] << " -fPIC" unless aix?
 
   # The list of arguments to pass to make
-  args = "PREFIX='#{install_dir}/embedded' VERSION='#{version}'"
+  args = "-e PREFIX='#{install_dir}/embedded' VERSION='#{version}'"
   args << " CFLAGS='-qpic=small -qpic=large -O2 -g -D_ALL_SOURCE -D_LARGE_FILES'" if aix?
 
   patch source: "makefile_take_env_vars.patch", plevel: 1, env: env
