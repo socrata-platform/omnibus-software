@@ -25,44 +25,43 @@ skip_transitive_dependency_licensing true
 # the default versions should always be the latest release of ruby
 # if you consume this definition it is your responsibility to pin
 # to the desired version of ruby. don't count on this not changing.
-default_version "2.6.3"
+default_version "2.6.5"
 
 dependency "zlib"
 dependency "openssl"
 dependency "libffi"
 dependency "libyaml"
 
+version("2.7.0")      { source sha256: "8c99aa93b5e2f1bc8437d1bbbefd27b13e7694025331f77245d0c068ef1f8cbe" }
+
+version("2.6.5")      { source sha256: "66976b716ecc1fd34f9b7c3c2b07bbd37631815377a2e3e85a5b194cfdcbed7d" }
+version("2.6.4")      { source sha256: "4fc1d8ba75505b3797020a6ffc85a8bcff6adc4dabae343b6572bf281ee17937" }
 version("2.6.3")      { source sha256: "577fd3795f22b8d91c1d4e6733637b0394d4082db659fccf224c774a2b1c82fb" }
 version("2.6.2")      { source sha256: "a0405d2bf2c2d2f332033b70dff354d224a864ab0edd462b7a413420453b49ab" }
 version("2.6.1")      { source sha256: "17024fb7bb203d9cf7a5a42c78ff6ce77140f9d083676044a7db67f1e5191cb8" }
+
+version("2.5.7")      { source sha256: "0b2d0d5e3451b6ab454f81b1bfca007407c0548dea403f1eba2e429da4add6d4" }
+version("2.5.6")      { source sha256: "1d7ed06c673020cd12a737ed686470552e8e99d72b82cd3c26daa3115c36bea7" }
 version("2.5.5")      { source sha256: "28a945fdf340e6ba04fc890b98648342e3cccfd6d223a48f3810572f11b2514c" }
 version("2.5.4")      { source sha256: "0e4042bce749352dfcf1b9e3013ba7c078b728f51f8adaf6470ce37675e3cb1f" }
 version("2.5.3")      { source sha256: "9828d03852c37c20fa333a0264f2490f07338576734d910ee3fd538c9520846c" }
 version("2.5.1")      { source sha256: "dac81822325b79c3ba9532b048c2123357d3310b2b40024202f360251d9829b1" }
 version("2.5.0")      { source sha256: "46e6f3630f1888eb653b15fa811d77b5b1df6fd7a3af436b343cfe4f4503f2ab" }
 
-version("2.4.6")      { source sha256: "de0dc8097023716099f7c8a6ffc751511b90de7f5694f401b59f2d071db910be" }
-version("2.4.5")      { source sha256: "6737741ae6ffa61174c8a3dcdd8ba92bc38827827ab1d7ea1ec78bc3cefc5198" }
-version("2.4.4")      { source sha256: "254f1c1a79e4cc814d1e7320bc5bdd995dc57e08727d30a767664619a9c8ae5a" }
-version("2.4.3")      { source sha256: "fd0375582c92045aa7d31854e724471fb469e11a4b08ff334d39052ccaaa3a98" }
-version("2.4.2")      { source sha256: "93b9e75e00b262bc4def6b26b7ae8717efc252c47154abb7392e54357e6c8c9c" }
-version("2.4.1")      { source sha256: "a330e10d5cb5e53b3a0078326c5731888bb55e32c4abfeb27d9e7f8e5d000250" }
-version("2.4.0")      { source sha256: "152fd0bd15a90b4a18213448f485d4b53e9f7662e1508190aa5b702446b29e3d" }
+version("2.4.9")      { source sha256: "f99b6b5e3aa53d579a49eb719dd0d3834d59124159a6d4351d1e039156b1c6ae" }
 
 version("2.3.8")      { source sha256: "b5016d61440e939045d4e22979e04708ed6c8e1c52e7edb2553cf40b73c59abf" }
-version("2.3.7")      { source sha256: "35cd349cddf78e4a0640d28ec8c7e88a2ae0db51ebd8926cd232bb70db2c7d7f" }
-version("2.3.6")      { source sha256: "8322513279f9edfa612d445bc111a87894fac1128eaa539301cebfc0dd51571e" }
-version("2.3.5")      { source sha256: "5462f7bbb28beff5da7441968471ed922f964db1abdce82b8860608acc23ddcc" }
-version("2.3.4")      { source sha256: "98e18f17c933318d0e32fed3aea67e304f174d03170a38fd920c4fbe49fec0c3" }
-version("2.3.3")      { source sha256: "241408c8c555b258846368830a06146e4849a1d58dcaf6b14a3b6a73058115b7" }
-version("2.3.1")      { source sha256: "b87c738cb2032bf4920fef8e3864dc5cf8eae9d89d8d523ce0236945c5797dcd" }
-version("2.3.0")      { source md5: "e81740ac7b14a9f837e9573601db3162" }
-
-version("2.2.10")     { source sha256: "cd51019eb9d9c786d6cb178c37f6812d8a41d6914a1edaf0050c051c75d7c358" }
-version("2.2.9")      { source sha256: "2f47c77054fc40ccfde22501425256d32c4fa0ccaf9554f0d699ed436beca1a6" }
-version("2.2.8")      { source sha256: "8f37b9d8538bf8e50ad098db2a716ea49585ad1601bbd347ef84ca0662d9268a" }
 
 source url: "https://cache.ruby-lang.org/pub/ruby/#{version.match(/^(\d+\.\d+)/)[0]}/ruby-#{version}.tar.gz"
+
+# In order to pass notarization we need to sign any binaries and libraries included in the package.
+# This makes sure we include and bins and libs that are brought in by gems.
+semver = Gem::Version.create(version).segments
+ruby_mmv = "#{semver[0..1].join(".")}.0"
+ruby_dir = "#{install_dir}/embedded/lib/ruby/#{ruby_mmv}"
+gem_dir = "#{install_dir}/embedded/lib/ruby/gems/#{ruby_mmv}"
+bin_dirs bin_dirs.concat ["#{gem_dir}/gems/*/bin/**"]
+lib_dirs ["#{ruby_dir}/**", "#{gem_dir}/extensions/**", "#{gem_dir}/gems/*", "#{gem_dir}/gems/*/lib/**", "#{gem_dir}/gems/*/ext/**"]
 
 relative_path "ruby-#{version}"
 
@@ -102,32 +101,68 @@ elsif solaris_11?
 elsif windows?
   env["CFLAGS"] = "-I#{install_dir}/embedded/include -DFD_SETSIZE=2048"
   if windows_arch_i386?
-    # 32-bit windows can't compile ruby with -O2 due to compiler bugs.
-    env["CFLAGS"] << " -m32 -march=i686 -O"
+    env["CFLAGS"] << " -m32 -march=i686 -O3"
   else
-    env["CFLAGS"] << " -m64 -march=x86-64 -O2"
+    env["CFLAGS"] << " -m64 -march=x86-64 -O3"
   end
   env["CPPFLAGS"] = env["CFLAGS"]
   env["CXXFLAGS"] = env["CFLAGS"]
 else # including linux
-  if version.satisfies?(">= 2.3.0") &&
-      rhel? && platform_version.satisfies?("< 6.0")
-    env["CFLAGS"] << " -O2 -g -pipe"
-  else
-    env["CFLAGS"] << " -O3 -g -pipe"
-  end
+  env["CFLAGS"] << " -O3 -g -pipe"
 end
 
 build do
   # AIX needs /opt/freeware/bin only for patch
   patch_env = env.dup
-  patch_env["PATH"] = "/opt/freeware/bin:#{env['PATH']}" if aix?
+  patch_env["PATH"] = "/opt/freeware/bin:#{env["PATH"]}" if aix?
+
+  # remove the warning that the win32 api is going away.
+  if windows?
+    if version.satisfies?(">= 2.6")
+      patch source: "ruby-win32_warning_removal_26plus.patch", plevel: 1, env: patch_env
+    else
+      patch source: "ruby-win32_warning_removal_25_and_below.patch", plevel: 1, env: patch_env
+    end
+  end
 
   # wrlinux7/ios_xr build boxes from Cisco include libssp and there is no way to
   # disable ruby from linking against it, but Cisco switches will not have the
   # library.  Disabling it as we do for Solaris.
   if ios_xr?
     patch source: "ruby-no-stack-protector.patch", plevel: 1, env: patch_env
+  end
+
+  # RHEL6 has a base compiler that does not support -fstack-protector-strong, but we
+  # cannot build modern ruby on the RHEL6 base compiler, and the configure script
+  # determines that it supports that flag and so includes it and then ultimately
+  # pushes that into native gem compilations which then blows up for end users when
+  # they try to install native gems.  So, we have to hack this up to avoid using
+  # that flag on RHEL6.
+  #
+  if rhel? && platform_version.satisfies?("< 7") && version.satisfies?(">= 2.6")
+    patch source: "ruby-no-stack-protector-strong.patch", plevel: 1, env: patch_env
+  end
+
+  # accelerate requires of c-extension.
+  #
+  # this would break code which did `require "thing"` and loaded thing.so and
+  # then fiddled with the libpath and did `require "thing"` and loaded thing.rb
+  # over the top of it.  AFAIK no sane ruby code should need to do that, and the
+  # cost of this behavior in core ruby is enormous.
+  #
+  patch source: "ruby-fast-load_26.patch", plevel: 1, env: patch_env
+
+  # accelerate requires by removing a File.expand_path
+  #
+  # the expand_path here seems to be largely useless and produces a large amount
+  # of lstat(2) calls on unix, and increases the runtime of a chef-client --version
+  # test by 33% on windows.  on modern linuxen that have openat(2) it is totally
+  # useless.  this patch breaks no built-in tests on ruby on old platforms, and
+  # it is unclear why or if it is necessary (hand crafted tests designed to try to
+  # abuse it all succeeded after this test).
+  #
+  if version.satisfies?(">= 2.6")
+    patch source: "ruby-faster-load_26.patch", plevel: 1, env: patch_env
   end
 
   # disable libpath in mkmf across all platforms, it trolls omnibus and
@@ -139,8 +174,6 @@ build do
   # and ruby trying to set LD_LIBRARY_PATH itself gets it wrong.
   #
   # Also, fix paths emitted in the makefile on windows on both msys and msys2.
-  # should intentionally break and fail to apply on 2.2, patch will need to
-  # be fixed.
   patch source: "ruby-mkmf.patch", plevel: 1, env: patch_env
 
   # Fix find_proxy with IP format proxy and domain format uri raises an exception.
@@ -173,7 +206,6 @@ build do
                        "--without-gdbm",
                        "--without-tk",
                        "--disable-dtrace"]
-  configure_command << "--with-ext=psych" if version.satisfies?("< 2.3")
   configure_command << "--with-bundled-md5" if fips_mode?
 
   # jit doesn't compile on all platforms in 2.6.0
@@ -184,6 +216,9 @@ build do
     # need to patch ruby's configure file so it knows how to find shared libraries
     if version.satisfies?(">= 2.6")
       patch source: "ruby-aix-configure_26_and_later.patch", plevel: 1, env: patch_env
+      if version == "2.6.4" || version == "2.6.5" # we may need this in 2.6.6 as well. :shrug:
+        patch source: "ruby-2.6.4-bug14834.patch", plevel: 1, env: patch_env
+      end
     else
       patch source: "ruby-aix-configure_pre26.patch", plevel: 1, env: patch_env
     end
@@ -195,8 +230,8 @@ build do
     patch source: "ruby-aix-atomic.patch", plevel: 1, env: patch_env
     patch source: "ruby-aix-vm-core.patch", plevel: 1, env: patch_env
 
-    # per IBM, just help ruby along on what it's running on
-    configure_command << "--host=powerpc-ibm-aix6.1.0.0 --target=powerpc-ibm-aix6.1.0.0 --build=powerpc-ibm-aix6.1.0.0 --enable-pthread"
+    # per IBM, just enable pthread
+    configure_command << "--enable-pthread"
 
   elsif freebsd?
     # Disable optional support C level backtrace support. This requires the

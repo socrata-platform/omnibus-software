@@ -1,5 +1,5 @@
 #
-# Copyright 2015 Chef Software, Inc.
+# Copyright 2019 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,23 +14,19 @@
 # limitations under the License.
 #
 
-name "chefspec"
-default_version "master"
-
-source git: "https://github.com/chefspec/chefspec.git"
-
-dependency "ruby"
-dependency "rubygems"
-dependency "bundler"
-dependency "chef"
-dependency "fauxhai"
+name "go-uninstall"
+default_version "0.0.1"
+license :project_license
+dependency "go"
 
 build do
-  env = with_standard_compiler_flags(with_embedded_path)
+  # Until Omnibus has full support for build depedencies (see chef/omnibus#483)
+  # we are going to manually uninstall Go
+  %w{go gofmt}.each do |bin|
+    delete "#{install_dir}/embedded/bin/#{bin}"
+  end
 
-  bundle "install --without development", env: env
-
-  gem "build chefspec.gemspec", env: env
-  gem "install chefspec-*.gem" \
-      "  --no-document", env: env
+  block "Delete Go language from embedded directory" do
+    remove_directory "#{install_dir}/embedded/go"
+  end
 end
